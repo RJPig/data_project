@@ -1,0 +1,322 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>可视化实训展示(网站客户数据)</title>
+<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+<script src="js/echarts.js"></script>
+<script src="js/china.js"></script>
+<script src="js/dark.js"></script>
+<style>#one{width: 800px;height: 400px;position: absolute;top:420px;left:10px;}</style>
+<style>#two{width: 800px;height: 400px;position: absolute;left:10px;}</style>
+<style>#three{width: 600px;height: 400px;position: absolute;top:420px;right:100px;}</style>
+
+</head>
+
+<body>
+<div id="one"></div>
+<div id="two"></div>
+<div id="three"></div>
+<script>
+var myFrist = echarts.init(document.getElementById('one'),'dark');//地图
+var mySecond = echarts.init(document.getElementById('two'),'dark');//序列分析
+var myThird = echarts.init(document.getElementById('three'),'dark');//散点图
+
+//地图
+$.ajax({
+	 type : "post",
+    // async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+     url : "Map",    //请求发送到TestServlet处
+     dataType : "json",        //返回数据形式为json
+     success : function(idata) {
+         //请求成功时执行该函数内容，result即为服务器返回的json对象
+         var message=[];
+
+		for(var i=0;i<idata.viewnum.length;i++){
+			var msg={};
+			msg.name=idata.province[i];
+			msg.value=idata.viewnum[i];
+			message.push(msg);
+		}
+		
+          myFrist.setOption({
+                      
+                        title: {
+                        	
+                            subtext: '地图',
+                            x:'left'
+                        },
+                        
+                        tooltip : {//提示框组件。
+                            trigger: 'item'//数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。
+                        },
+                        
+                        toolbox: {//工具栏
+                            show: true,
+                            orient : 'vertical',//工具栏 icon 的布局朝向
+                            x: 'right',
+                            y: 'center',
+                            feature : {//各工具配置项。
+                                mark : {show: true},
+                                dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                                restore : {show: true},//配置项还原。
+                                saveAsImage : {show: true}//保存为图片。
+                            }
+                        },
+                        
+                        
+                        visualMap: {
+                            min: 0,
+                            max: 13000,
+                            splitNumber: 10,
+                            color: ['#d94e5d','#eac736','#50a3ba'],
+                            textStyle: {
+                                color: '#fff'
+                            }
+                        },
+                        
+                        series: [
+                            {
+                                name: '访问量',
+                                type: 'map',
+                                mapType: 'china',
+                                roam: false,//是否开启鼠标缩放和平移漫游
+                                itemStyle:{//地图区域的多边形 图形样式
+                                    normal:{//是图形在默认状态下的样式
+                                        label:{
+                                            show:true,//是否显示标签
+                                            textStyle: {
+                                                color: "rgb(249, 249, 249)"
+                                            }
+                                        }
+                                    },
+                                    emphasis:{//是图形在高亮状态下的样式,比如在鼠标悬浮或者图例联动高亮时
+                                        label:{show:true}
+                                    }
+                                },
+                                top:"3%",//组件距离容器的距离
+                                data:message
+                            }
+                        ],
+                   
+          })
+
+     }
+});
+    myFrist.on('mouseover', function (params) {
+        var dataIndex = params.dataIndex;
+        console.log(params);
+    })
+    
+//序列分析数据图
+$.ajax({
+	 type : "post",
+    // async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+     url : "Map",    //请求发送到TestServlet处
+     dataType : "json",        //返回数据形式为json
+     success : function(bdata) {
+  		mySecond.setOption({
+  			legend:{
+  				data:['媒介A','媒介B','媒介C','媒介D','媒介E']
+  		},
+  			title:{
+  				subtext:"序列分析",
+  				x:'left'
+  			},
+  			tooltip:{
+  				trigger:'axis'
+  			},
+            toolbox: {//工具栏
+                show: true,
+                orient : 'vertical',//工具栏 icon 的布局朝向
+                x: 'right',
+                y: 'center',
+                feature : {//各工具配置项。
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                    restore : {show: true},//配置项还原。
+                    saveAsImage : {show: true}//保存为图片。
+                }
+            },
+  			xAxis:{
+  				name:"日期",
+  				data:bdata.date,
+				axisLabel:{
+					interval:10,
+					rotate:30,
+					textStyle:{
+						fontSize:10
+					}
+					}
+  			},
+  			yAxis:{
+  				name:"访问量",
+  				type:'value'
+  			},
+
+  			series:[
+  	  			{
+  	  				name:"媒介E",
+  	  				type:'line',
+  	  				data:bdata.mediume,
+  	  				stack:'media',
+  	  				areaStyle:{}
+  	  			},
+  	  			{
+  	  				name:"媒介D",
+  	  				type:'line',
+  	  				data:bdata.mediumd,
+  	  				stack:'media',
+  	  				areaStyle:{}
+  	  			},
+  	  			{
+  	  				name:"媒介C",
+  	  				type:'line',
+  	  				data:bdata.mediumc,
+  	  				stack:'media',
+  	  				areaStyle:{}
+  	  			},
+  	  			{
+  	  				name:"媒介B",
+  	  				type:'line',
+  	  				data:bdata.mediumb,
+  	  				stack:'media',
+  	  				areaStyle:{}
+  	  				
+  	  			},
+  	  			{
+  	  				name:"媒介A",
+  	  				type:'line',
+  	  				data:bdata.mediuma,
+  	  				stack:'media',
+  	  				areaStyle:{}
+  	  			}
+  			]
+  		});  	 
+     }
+  })
+
+  
+//散点图
+$.ajax({
+	 type : "post",
+    // async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+     url : "Map",    //请求发送到TestServlet处
+     dataType : "json",        //返回数据形式为json
+     success : function(cdata) {
+         //请求成功时执行该函数内容，result即为服务器返回的json对象
+         var amessage=[];
+         var bmessage=[];
+         var cmessage=[];
+         var dmessage=[];
+         var emessage=[];
+
+ 		var stype=[
+			{name: 'type', index: 0, text: '类型'},
+			{name:'viewnum',index:1,text:'访问量'},
+			{name:'finsh',index:2,text:'目标完成'}
+		];
+ 		
+		for(var i=0;i<cdata.allmedium.length;i++){
+			if(cdata.allmedium[i]=="A"){
+			var amsg=[];
+			amsg.push(cdata.typeviewnum[i]);
+			amsg.push(cdata.finsh[i]);
+			amsg.push(cdata.type[i]);
+			amessage.push(amsg);
+			}
+			if(cdata.allmedium[i]=="B"){
+				var bmsg=[];
+				bmsg.push(cdata.typeviewnum[i]);
+				bmsg.push(cdata.finsh[i]);
+				bmsg.push(cdata.type[i]);
+				bmessage.push(bmsg);
+				}
+			if(cdata.allmedium[i]=="C"){
+				var cmsg=[];
+				cmsg.push(cdata.typeviewnum[i]);
+				cmsg.push(cdata.finsh[i]);
+				cmsg.push(cdata.type[i]);
+				cmessage.push(cmsg);
+				}
+			if(cdata.allmedium[i]=="D"){
+				var dmsg=[];
+				dmsg.push(cdata.typeviewnum[i]);
+				dmsg.push(cdata.finsh[i]);
+				dmsg.push(cdata.type[i]);
+				dmessage.push(dmsg);
+				}
+			if(cdata.allmedium[i]=="E"){
+				var emsg=[];
+				emsg.push(cdata.typeviewnum[i]);
+				emsg.push(cdata.finsh[i]);
+				emsg.push(cdata.type[i]);
+				emessage.push(emsg);
+				}
+		}	
+          myThird.setOption({
+                      
+                        title: {
+                        	
+                            subtext: '散点图',
+                            x:'left'
+                        },
+                        
+                        legend:{
+                        	data:["A","B","C","D","E"]
+                        },
+                        
+                        color:["#FFB6C1","#DC143C","#FF1493","#DDA0DD","#0000CD"],
+                        
+                        tooltip : {//提示框组件。
+                            trigger: 'item',//数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。
+                            axisPointer: {
+            		            type: 'cross'
+            		        },
+            		        formatter: function (obj){
+            		        	var value = obj.value;
+            		            return stype[0].text+':'+value[2]+'</br>'+
+            		            stype[1].text+':'+value[0]+'</br>'+
+            		            stype[2].text+':'+value[1]
+            		        }
+                        },
+                        
+                        
+                        toolbox: {//工具栏
+                            show: true,
+                            orient : 'vertical',//工具栏 icon 的布局朝向
+                            x: 'right',
+                            y: 'center',
+                            feature : {//各工具配置项。
+                                mark : {show: true},
+                                dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                                restore : {show: true},//配置项还原。
+                                saveAsImage : {show: true}//保存为图片。
+                            }
+                        },
+						xAxis:{
+							name:"访问量"
+						},
+						yAxis:{
+							name:"目标完成"
+						},
+						
+                        series: [
+                            {name:"A",type:'scatter',data:amessage},
+                            {name:"B",type:'scatter',data:bmessage},
+                            {name:"C",type:'scatter',data:cmessage},
+                            {name:"D",type:'scatter',data:dmessage},
+                            {name:"E",type:'scatter',data:emessage}
+                        ],
+                   
+          })
+
+     }
+});
+    myThird.on('mouseover', function (params) {
+        var dataIndex = params.dataIndex;
+        console.log(params);
+    })
+</script>
+</body>
+</html>

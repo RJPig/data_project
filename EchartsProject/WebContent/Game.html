@@ -1,0 +1,508 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>可视化实训演示(游戏客户洞察)</title>
+<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+<script src="js/echarts.js"></script>
+<script src="js/dark.js"></script>
+<style>#one{width: 600px;height: 400px;position: absolute;top:10px;left:10px;}</style>
+<style>#two{width: 800px;height: 400px;position: absolute;top:10px;right:100px;}</style>
+<style>#third{width: 600px;height: 400px;position: absolute;top:420px;left:10px;}</style>
+<style>#fourth{width: 800px;height: 400px;position: absolute;top:420px;right:100px;}</style>
+
+</head>
+
+<body>
+<div id="one"></div>
+<div id="two"></div>
+<div id="third"></div>
+<div id="fourth"></div>
+
+<script>
+var myFirst = echarts.init(document.getElementById('one'),'dark');//客户属性分析 
+var mySecond = echarts.init(document.getElementById('two'),'dark');//类型细分
+var myThird = echarts.init(document.getElementById('third'),'dark');//记录数
+var myFourth = echarts.init(document.getElementById('fourth'),'dark');//生命消耗
+
+//客户属性分析		
+          myFirst.setOption({
+                      
+                        title: {
+                        	
+                            subtext: '客户属性分析',
+                            x:'left'
+                        },
+                        
+                        legend:{
+                        	data:["男","女"]
+                        },
+                        
+                        
+                        tooltip : {
+                            trigger: 'axis',
+                            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                            }
+                            
+                        },
+                        
+
+                        
+                        toolbox: {//工具栏
+                            show: true,
+                            orient : 'vertical',//工具栏 icon 的布局朝向
+                            x: 'right',
+                            y: 'center',
+                            feature : {//各工具配置项。
+                                mark : {show: true},
+                                dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                                restore : {show: true},//配置项还原。
+                                saveAsImage : {show: true}//保存为图片。
+                            }
+                        },
+						xAxis:{
+							name:"人数",
+							type:'value'
+						},
+						
+						yAxis:{
+							name:"年龄/数据桶",
+							type:'category',
+				            axisTick : {show: false},
+							data:["45","40","35","30","25","20","15","10","5"]
+						},
+						
+                        series: [
+                            {
+                            	name:"男",
+                            	type:'bar',
+                                label: {
+                                    normal: {
+                                        show: true,
+                                        position: 'inside'
+                                    }
+                                },
+                            	data:[2,53,108,75,90,106,76,62,7]
+                            },
+                            {
+                            	name:"女",
+                            	type:"bar",
+                                label: {
+                                    normal: {
+                                        show: true,
+                                        position: 'inside'
+                                    }
+                                },
+                            	data:[3,29,50,49,35,49,39,28,4]
+                            }
+                        ],
+                   
+          })
+
+    myFirst.on('mouseover', function (params) {
+        var dataIndex = params.dataIndex;
+        console.log(params);
+    })
+    
+//类型细分
+	$.ajax({
+		url:'Game',
+		dataType:'json',
+		type:'post',
+		success:function(idata){
+			var A=[],B=[],C=[],D=[],E=[],F=[],TIME=[],j=120,a=[],b=[],c=[],d=[],e=[],f=[]
+			for(var i=0;i<54;i++){
+				TIME.push(j)
+				j=j+20
+			}
+			for(var i=0;i<54;i++){
+				a.push(0)
+				b.push(0)
+				c.push(0)
+				d.push(0)
+				e.push(0)
+				f.push(0)
+			}
+			for(var i=0;i<idata.type.length;i++){
+				if(idata.limit[i]=='是'||idata.limit[i]=='否' && idata.type[i]=='死于游戏'){
+					A.push(idata.time[i])
+				}
+				if(idata.limit[i]=='是'||idata.limit[i]=='否' && idata.type[i]=='附加购买'){
+					B.push(idata.time[i])
+				}
+				if(idata.limit[i]=='是'||idata.limit[i]=='否' && idata.type[i]=='魔力彩蛋检索'){
+					C.push(idata.time[i])
+				}
+				if(idata.limit[i]=="" && idata.type[i]=='死于游戏'){
+					D.push(idata.time[i])
+				}
+				if(idata.limit[i]=="" && idata.type[i]=='附加购买'){
+					E.push(idata.time[i])
+				}
+				if(idata.limit[i]=="" && idata.type[i]=='魔力彩蛋检索'){
+					F.push(idata.time[i])
+				}
+			}
+			for(var i=0;i<A.length;i++){
+				for(var j=0;j<TIME.length-1;j++){
+					if(TIME[j]<=A[i] && A[i]<TIME[j+1]){
+						a[j]+=1
+					}else if(TIME[TIME.length-1]<=A[i]){
+						a[j+1]+=1
+					}
+				}
+			}
+			for(var i=0;i<B.length;i++){
+				for(var j=0;j<TIME.length-1;j++){
+					if(TIME[j]<=B[i] && B[i]<TIME[j+1]){
+						b[j]+=1
+					}else if(TIME[TIME.length-1]<=B[i]){
+						b[j+1]+=1
+					}
+				}
+			}
+			for(var i=0;i<C.length;i++){
+				for(var j=0;j<TIME.length-1;j++){
+					if(TIME[j]<=C[i] && C[i]<TIME[j+1]){
+						c[j]+=1
+					}else if(TIME[TIME.length-1]<=C[i]){
+						c[j+1]+=1
+					}
+				}
+			}
+			for(var i=0;i<D.length;i++){
+				for(var j=0;j<TIME.length-1;j++){
+					if(TIME[j]<=D[i] && D[i]<TIME[j+1]){
+						d[j]+=1
+					}else if(TIME[TIME.length-1]<=D[i]){
+						d[j+1]+=1
+					}
+				}
+			}
+			for(var i=0;i<E.length;i++){
+				for(var j=0;j<TIME.length-1;j++){
+					if(TIME[j]<=E[i] && E[i]<TIME[j+1]){
+						e[j]+=1
+					}else if(TIME[TIME.length-1]<=E[i]){
+						e[j+1]+=1
+					}
+				}
+			}
+			for(var i=0;i<F.length;i++){
+				for(var j=0;j<TIME.length-1;j++){
+					if(TIME[j]<=F[i] && F[i]<TIME[j+1]){
+						f[j]+=1
+					}else if(TIME[TIME.length-1]<=F[i]){
+						f[j+1]+=1
+					}
+				}
+			}
+          mySecond.setOption({
+                        title: {
+                        	
+                            subtext: '类型细分',
+                            x:'left'
+                        },
+                        
+                        legend:{
+                        	data:["魔力彩蛋检索(界内)","魔力彩蛋检索(界外)","死于游戏(界内)","死于游戏(界外)","附加购买(界内)","附加购买(界外)"]
+                        },
+                                                
+                        tooltip : {
+                            trigger: 'axis'
+                        },
+                        
+
+                        
+                        toolbox: {//工具栏
+                            show: true,
+                            orient : 'vertical',//工具栏 icon 的布局朝向
+                            x: 'right',
+                            y: 'center',
+                            feature : {//各工具配置项。
+                                mark : {show: true},
+                                dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                                restore : {show: true},//配置项还原。
+                                saveAsImage : {show: true}//保存为图片。
+                            }
+                        },
+                        
+						xAxis:{
+							axisLabel:{
+								interval:2,
+					        	rotate:30
+					        },
+							name:"持续时间/数据桶",
+							data:TIME
+						},
+						
+						yAxis:{
+							name:"记录数"
+						},
+						
+                        series: [
+                            {
+                            	name:"死于游戏(界内)",
+                            	type:'bar',
+                            	stack:"总量",
+                            	data:d
+                            },
+                            {
+                            	name:"死于游戏(界外)",
+                            	type:'bar',
+                            	stack:"总量",
+                            	data:a
+                            },
+                            {
+                            	name:"魔力彩蛋检索(界内)",
+                            	type:'bar',
+                            	stack:"总量",
+                            	data:f
+                            },
+                            {
+                            	name:"魔力彩蛋检索(界外)",
+                            	type:'bar',
+                            	stack:"总量",
+                            	data:c
+                            },
+                            {
+                            	name:"附加购买(界内)",
+                            	type:'bar',
+                            	stack:"总量",
+                            	data:e
+                            },
+                            {
+                            	name:"附加购买(界外)",
+                            	type:'bar',
+                            	stack:"总量",
+                            	data:b
+                            }
+                        ],
+                   
+          })
+		}
+	})
+    mySecond.on('mouseover', function (params) {
+        var dataIndex = params.dataIndex;
+        console.log(params);
+    })
+    
+    
+//记录数
+	$.ajax({
+		url:'Game',
+		dataType:'json',
+		type:'post',
+		success:function(bdata){
+          myThird.setOption({
+                        title: {
+                        	
+                            subtext: '记录数',
+                            x:'left'
+                        },
+                        
+                        legend:{
+                        	data:["记录数"]
+                        },
+                                                
+                        tooltip : {
+                            trigger: 'axis'
+                        },
+                        
+
+                        
+                        toolbox: {//工具栏
+                            show: true,
+                            orient : 'vertical',//工具栏 icon 的布局朝向
+                            x: 'right',
+                            y: 'center',
+                            feature : {//各工具配置项。
+                                mark : {show: true},
+                                dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                                restore : {show: true},//配置项还原。
+                                saveAsImage : {show: true}//保存为图片。
+                            }
+                        },
+                        
+						xAxis:{
+							axisLabel:{
+								interval:50,
+					        	rotate:30
+					        },
+							name:"日期",
+							data:bdata.date
+						},
+						
+						yAxis:{
+							name:"记录数"
+						},
+						
+                        series: [
+                            {
+                            	name:"记录数",
+                            	type:'line',
+                            	data:bdata.cdate
+                            }
+                        ],
+                   
+          })
+		}
+	})
+    myThird.on('mouseover', function (params) {
+        var dataIndex = params.dataIndex;
+        console.log(params);
+    })
+    
+//生命消耗
+	$.ajax({
+		url:'Game',
+		dataType:'json',
+		type:'post',
+		success:function(cdata){
+			var A=[],B=[],C=[],D=[],E=[],F=[],a=[],b=[],c=[],d=[],e=[],f=[]
+
+
+			for(var i=0;i<cdata.type2.length;i++){
+				if(cdata.limit2[i]=='是'||cdata.limit2[i]=='否' && cdata.type2[i]=='死于游戏'){
+					var a=[];
+					a.push(cdata.date[i]);
+					a.push(cdata.hp[i]);
+					
+					A.push(a)
+				}
+				if(cdata.limit2[i]=='是'||cdata.limit2[i]=='否' && cdata.type2[i]=='附加购买'){
+					var b=[];
+					b.push(cdata.date[i]);
+					b.push(cdata.hp[i]);
+					
+					B.push(b)
+
+				}
+				if(cdata.limit2[i]=='是'||cdata.limit2[i]=='否' && cdata.type2[i]=='魔力彩蛋检索'){
+					var c=[];
+					c.push(cdata.date[i]);
+					c.push(cdata.hp[i]);
+					
+					C.push(c)
+
+				}
+				if(cdata.limit2[i]=="" && cdata.type2[i]=='死于游戏'){
+					var d=[];
+					d.push(cdata.date[i]);
+					d.push(cdata.hp[i]);
+					
+					D.push()
+				}
+				if(cdata.limit2[i]=="" && cdata.type2[i]=='附加购买'){
+					var e=[];
+					e.push(cdata.date[i]);
+					e.push(cdata.hp[i]);
+					
+					E.push(e)
+
+				}
+				if(cdata.limit2[i]=="" && cdata.type2[i]=='魔力彩蛋检索'){
+					var f=[];
+					f.push(cdata.date[i]);
+					f.push(cdata.hp[i]);
+					F.push(f)
+
+				}
+			}
+
+          myFourth.setOption({
+                        title: {
+                        	
+                            subtext: '生命消耗值',
+                            x:'left'
+                        },
+                        
+                        legend:{
+                        	data:["魔力彩蛋检索(界内)","魔力彩蛋检索(界外)","死于游戏(界内)","死于游戏(界外)","附加购买(界内)","附加购买(界外)"]
+                        },
+                                                
+                        tooltip : {
+                        	trigger: 'item',//数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。
+                            axisPointer: {
+            		            type: 'cross'
+                            }
+                        },
+                        
+
+                        
+                        toolbox: {//工具栏
+                            show: true,
+                            orient : 'vertical',//工具栏 icon 的布局朝向
+                            x: 'right',
+                            y: 'center',
+                            feature : {//各工具配置项。
+                                mark : {show: true},
+                                dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                                restore : {show: true},//配置项还原。
+                                saveAsImage : {show: true}//保存为图片。
+                            }
+                        },
+                        
+						xAxis:{
+							axisLabel:{
+					        	rotate:30
+					        },
+							name:"日期",
+							type:'time'
+						},
+						
+						yAxis:{
+							name:"生命消耗值",
+							min:'320'
+						},
+						
+                        series: [
+                         	{
+                         		name:'死于游戏(界外)',
+                         		type:'scatter',
+                         		stack:'类型',
+                         		data:A
+                         	},
+                         	{
+                         		name:'死于游戏(界内)',
+                         		type:'scatter',
+                         		stack:'类型',
+                         		data:D
+                         	},
+                         	{
+                         		name:'附加购买(界外)',
+                         		type:'scatter',
+                         		stack:'类型',
+                         		data:B
+                         	},
+                         	{
+                         		name:'附加购买(界内)',
+                         		type:'scatter',
+                         		stack:'类型',
+                         		data:E
+                         	},
+                         	{
+                         		name:'魔力彩蛋检索(界外)',
+                         		type:'scatter',
+                         		stack:'类型',
+                         		data:C
+                         	},
+                         	{
+                         		name:'魔力彩蛋检索(界内)',
+                         		type:'scatter',
+                         		stack:'类型',
+                         		data:F
+                         	},
+                        ],
+                   
+          })
+		}
+	})
+    myFourth.on('mouseover', function (params) {
+        var dataIndex = params.dataIndex;
+        console.log(params);
+    })
+</script>
+</body>
+</html>

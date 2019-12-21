@@ -1,0 +1,858 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>可视化实训展示(tableau官网各模块访问情况)</title>
+<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+<script src="js/echarts.js"></script>
+<script src="js/china.js"></script>
+<script src="js/dark.js"></script>
+<style>#one{width: 750px;height: 500px;position: absolute;top:10px;}</style>
+<style>#two{width: 700px;height: 500px;position: absolute;top:10px;left:800px;}</style>
+<style>#three{width: 700px;height: 500px;position: absolute;top:520px;left:800px;}</style>
+<style>#first{width: 750px;height: 400px;position: absolute;top:520px;left:10px;}</style>
+<style>#second{width: 750px;height: 400px;position: absolute;top:920px;left:10px;}</style>
+<style>#third{width: 750px;height: 400px;position: absolute;top:1320px;left:10px;}</style>
+
+
+</head>
+
+<body>
+<div id="one"></div>
+<div id="two"></div>
+<div id="three"></div>
+<div id="first"></div>
+<div id="second"></div>
+<div id="third"></div>
+
+
+<script>
+var myFirst=echarts.init(document.getElementById('one'),'dark');//各模块总访问量树地图
+var mySecond=echarts.init(document.getElementById('two'),'dark');//网站各版块访问量走势
+var myThird=echarts.init(document.getElementById('three'),'dark');//页面停留时间,访问人数交叉分析
+var myOne=echarts.init(document.getElementById('first'),'dark');//网页访问量
+var myTwo=echarts.init(document.getElementById('second'),'dark');//退出
+var myThree=echarts.init(document.getElementById('third'),'dark');//单次浏览时长
+
+
+//各模块总访问量树地图
+myFirst.setOption({
+	title:{
+		subtext:"各模块总访问量树地图",
+		x:'left'
+	},
+	
+	tooltip:{
+		trigger:'item',
+	},
+	
+	toolbox: {//工具栏
+        show: true,
+        orient : 'vertical',//工具栏 icon 的布局朝向
+        x: 'right',
+        y: 'center',
+        feature : {//各工具配置项。
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+            restore : {show: true},//配置项还原。
+            saveAsImage : {show: true}//保存为图片。
+        }
+    },
+    
+    series:[{
+    	type:'treemap',
+    	data:[
+    		{
+    			name:'博客',
+    			value:15203
+    		},
+    		{
+    			name:'查找',
+    			value:983
+    		},
+    		{
+    			name:'案例',
+    			value:94238
+    		},
+    		{
+    			name:'注册',
+    			value:33941
+    		},
+    		{
+    			name:'用户生成',
+    			value:139012
+    		},
+    		{
+    			name:'社区',
+    			value:26797
+    		},
+    		{
+    			name:'训练',
+    			value:6304
+    		}
+    	]
+    }]
+})
+
+//网站各版块访问量走势
+$.ajax({
+	 type : "post",
+    // async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+     url : "Web",    //请求发送到TestServlet处
+     dataType : "json",        //返回数据形式为json
+     success : function(idata) {
+    	 var a=[],b=[],c=[],d=[],e=[],f=[],g=[]
+    	 for(var i=0;i<idata.type.length;i++){
+    		 if(idata.type[i]=="博客"){
+    			 a.push(idata.visit[i]);
+    		 }
+    		 if(idata.type[i]=="查找"){
+    			 b.push(idata.visit[i]);
+    		 }
+    		 if(idata.type[i]=="案例"){
+    			 c.push(idata.visit[i]);
+    		 }
+    		 if(idata.type[i]=="注册"){
+    			 d.push(idata.visit[i]);
+    		 }
+    		 if(idata.type[i]=="用户生成"){
+    			 e.push(idata.visit[i]);
+    		 }
+    		 if(idata.type[i]=="社区"){
+    			 f.push(idata.visit[i]);
+    		 }
+    		 if(idata.type[i]=="训练"){
+    			 g.push(idata.visit[i]);
+    		 }
+    	 }
+
+    	 mySecond.setOption({
+		    		 title: {
+		                        	
+		                    subtext: '网站各版块访问量走势',
+		                    x:'left'
+		                     },
+		                     
+		             tooltip : {//提示框组件。
+		                     trigger: 'axis'//数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。
+		                     },
+		             legend:{
+		            	 data:['博客','查找','案例','注册','用户生成','社区','训练']
+		             },
+		             
+		             toolbox: {//工具栏
+		                    show: true,
+		                    orient : 'vertical',//工具栏 icon 的布局朝向
+		                    x: 'right',
+		                    y: 'center',
+		                    feature : {//各工具配置项。
+		                          mark : {show: true},
+		                          dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+		                          restore : {show: true},//配置项还原。
+		                          saveAsImage : {show: true}//保存为图片。
+		                           }
+		                       },
+		                       
+		              xAxis:{
+		            	  name:'日期',
+		            	  axisLabel:{
+					        	rotate:30
+					        },
+					      data:['2012-11-14','2012-11-16','2012-11-18',
+					    	  '2012-11-20','2012-11-22','2012-11-24',
+					    	  '2012-11-26','2012-11-28','2012-11-30',
+					    	  '2012-12-02','2012-12-04','2012-12-06',
+					    	  '2012-12-08','2012-12-10','2012-12-12',
+					    	  '2012-12-14','2012-12-16','2012-12-18',
+					    	  '2012-12-20','2012-12-22','2012-12-24',
+					    	  '2012-12-26','2012-12-28','2012-12-30'
+					    	  ]
+		              },
+		              yAxis:{
+		            	  name:'网页访问量'
+		              },
+		              series:[
+		            	  
+		            	{
+		            	  name:'博客',
+		            	  type:'line',
+		            	  data:a
+		              },
+		              
+		              {
+		            	  name:'查找',
+		            	  type:'line',
+		            	  data:b
+		              },
+		              
+		              {
+		            	  name:'案例',
+		            	  type:'line',
+		            	  data:c
+		              },
+		              
+		              {
+		            	  name:'注册',
+		            	  type:'line',
+		            	  data:d
+		              },
+		              
+		              {
+		            	  name:'用户生成',
+		            	  type:'line',
+		            	  data:e
+		              },
+		              
+		              {
+		            	  name:'社区',
+		            	  type:'line',
+		            	  data:f
+		              },
+		              
+		              {
+		            	  name:'训练',
+		            	  type:'line',
+		            	  data:g
+		              }
+		            	  ]
+    	 })
+     }
+})
+
+//页面停留时间,访问人数交叉分析
+$.ajax({
+	 type : "post",
+    // async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+     url : "Web",    //请求发送到TestServlet处
+     dataType : "json",        //返回数据形式为json
+     success : function(bdata) {
+         //请求成功时执行该函数内容，result即为服务器返回的json对象
+         var amessage=[];
+         var bmessage=[];
+         var cmessage=[];
+         var dmessage=[];
+         var emessage=[];
+         var fmessage=[];
+         var gmessage=[];
+   		var stype=[
+			{name: 'type', index: 0, text: '网站模块'},
+			{name:'page',index:1,text:'页面'},
+			{name:'time',index:2,text:'平均值 单次访问时长'},
+			{name:'visit',index:3,text:'网页访问量'},
+			{name:'people',index:4,text:'访问人数'},
+			
+		];
+
+ 		
+		for(var i=0;i<bdata.type2.length;i++){
+			if(bdata.type2[i]=="博客"){
+			var amsg=[];
+			amsg.push(bdata.people[i]);
+			amsg.push(bdata.time[i]);
+			amsg.push(bdata.page[i]);
+			amsg.push(bdata.visit2[i]);
+			amsg.push(bdata.type2[i]);
+
+			amessage.push(amsg);
+			}
+			if(bdata.type2[i]=="查找"){
+				var bmsg=[];
+				bmsg.push(bdata.people[i]);
+				bmsg.push(bdata.time[i]);
+				bmsg.push(bdata.page[i]);
+				bmsg.push(bdata.visit2[i]);
+				bmsg.push(bdata.type2[i]);
+				bmessage.push(bmsg);
+				}
+			if(bdata.type2[i]=="案例"){
+				var cmsg=[];
+				cmsg.push(bdata.people[i]);
+				cmsg.push(bdata.time[i]);
+				cmsg.push(bdata.page[i]);
+				cmsg.push(bdata.visit2[i]);
+				cmsg.push(bdata.type2[i]);
+				cmessage.push(cmsg);
+				}
+			if(bdata.type2[i]=="注册"){
+				var dmsg=[];
+				dmsg.push(bdata.people[i]);
+				dmsg.push(bdata.time[i]);
+				dmsg.push(bdata.page[i]);
+				dmsg.push(bdata.visit2[i]);
+				dmsg.push(bdata.type2[i]);
+				dmessage.push(dmsg);
+				}
+			if(bdata.type2[i]=="用户生成"){
+				var emsg=[];
+				emsg.push(bdata.people[i]);
+				emsg.push(bdata.time[i]);
+				emsg.push(bdata.page[i]);
+				emsg.push(bdata.visit2[i]);
+				emsg.push(bdata.type2[i]);
+				emessage.push(emsg);
+				}
+			if(bdata.type2[i]=="社区"){
+				var fmsg=[];
+				fmsg.push(bdata.people[i]);
+				fmsg.push(bdata.time[i]);
+				fmsg.push(bdata.page[i]);
+				fmsg.push(bdata.visit2[i]);
+				fmsg.push(bdata.type2[i]);
+				fmessage.push(fmsg);
+				}
+			if(bdata.type2[i]=="训练"){
+				var gmsg=[];
+				gmsg.push(bdata.people[i]);
+				gmsg.push(bdata.time[i]);
+				gmsg.push(bdata.page[i]);
+				gmsg.push(bdata.visit2[i]);
+				gmsg.push(bdata.type2[i]);
+				gmessage.push(gmsg);
+				}
+		}
+          myThird.setOption({
+                      
+                        title: {
+                        	
+                            subtext: '页面停留时间',
+                            x:'left'
+                        },
+                        
+                        legend:{
+                        	data:['博客','查找','案例','注册','用户生成','社区','训练']
+                        },
+                        
+                        color:["#FFB6C1","#DC143C","#FF1493","#DDA0DD","#0000CD","yellow","#FFF0F5"],
+                        
+                        tooltip : {//提示框组件。
+                            trigger: 'item',//数据项图形触发，主要在散点图，饼图等无类目轴的图表中使用。
+            		        formatter: function (obj){
+            		        	var value = obj.value;
+            		            return stype[0].text+':'+value[4]+'</br>'+
+            		            stype[1].text+':'+value[2]+'</br>'+
+            		            stype[2].text+':'+value[1]+'</br>'+
+            		            stype[3].text+':'+value[3]+'</br>'+
+            		            stype[4].text+':'+value[0]
+            		        },
+            		        axisPointer: {
+            		            type: 'cross'
+            		        },
+                        },
+                        
+                        
+                        toolbox: {//工具栏
+                            show: true,
+                            orient : 'vertical',//工具栏 icon 的布局朝向
+                            x: 'right',
+                            y: 'center',
+                            feature : {//各工具配置项。
+                                mark : {show: true},
+                                dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                                restore : {show: true},//配置项还原。
+                                saveAsImage : {show: true}//保存为图片。
+                            }
+                        },
+						xAxis:{
+							name:"访问人数"
+						},
+						yAxis:{
+							name:"平均值 单次浏览时长"
+						},
+						
+                        series: [
+                            {name:"博客",type:'scatter',data:amessage},
+                            {name:"查找",type:'scatter',data:bmessage},
+                            {name:"案例",type:'scatter',data:cmessage},
+                            {name:"注册",type:'scatter',data:dmessage},
+                            {name:"用户生成",type:'scatter',data:emessage},
+                            {name:"社区",type:'scatter',data:fmessage},
+                            {name:"训练",type:'scatter',data:gmessage}
+                        ],
+                   
+          })
+
+     }
+});
+
+//三个柱状图
+//网页访问量
+$.ajax({
+		 type : "post",
+    // async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+     url : "Web",    //请求发送到TestServlet处
+     dataType : "json",        //返回数据形式为json
+     success : function(cdata) {
+    	 var page1=[],page2=[],page3=[],page4=[],page5=[],page6=[],page7=[],
+    	 visit1=[],visit2=[],visit3=[],visit4=[],visit5=[],visit6=[],visit7=[];
+  		var stype=[
+			{name: 'type', index: 0, text: '网站模块'},
+			{name:'page',index:1,text:'页面'},
+			{name:'visit',index:2,text:'网页访问量'},
+		];
+ 		
+		for(var i=0;i<cdata.type3.length;i++){
+			if(cdata.type3[i]=="博客"){
+
+			visit1.push(cdata.visit3[i]);
+			page1.push(cdata.page3[i]);
+			}
+			if(cdata.type3[i]=="查找"){
+
+				visit2.push(cdata.visit3[i]);
+				page2.push(cdata.page3[i]);
+				}
+			if(cdata.type3[i]=="案例"){
+
+				visit3.push(cdata.visit3[i]);
+				page3.push(cdata.page3[i]);
+				}
+			if(cdata.type3[i]=="注册"){
+
+				visit4.push(cdata.visit3[i]);
+				page4.push(cdata.page3[i]);
+				}
+			if(cdata.type3[i]=="用户生成"){
+
+				visit5.push(cdata.visit3[i]);
+				page5.push(cdata.page3[i]);
+				}
+			if(cdata.type3[i]=="社区"){
+
+				visit6.push(cdata.visit3[i]);
+				page6.push(cdata.page3[i]);
+				}
+			if(cdata.type3[i]=="训练"){
+
+				visit7.push(cdata.visit3[i]);
+				page7.push(cdata.page3[i]);
+				}
+		}
+
+
+        myOne.setOption({
+            
+            title: {
+                subtext: '网页访问量',
+                x:'left'
+            },
+            
+            legend:{
+            	data:['博客','查找','案例','注册','用户生成','社区','训练']
+            },
+            
+            
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+                
+            },
+            
+
+            
+            toolbox: {//工具栏
+                show: true,
+                orient : 'vertical',//工具栏 icon 的布局朝向
+                x: 'right',
+                y: 'center',
+                feature : {//各工具配置项。
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                    restore : {show: true},//配置项还原。
+                    saveAsImage : {show: true}//保存为图片。
+                }
+            },
+			xAxis:{
+				name:"网页访问量",
+				type:'value'
+			},
+			
+			yAxis:{
+				name:"页面",
+				type:'category',
+	            axisTick : {show: false},
+				data:cdata.page3
+			},
+			grid:{
+				x:100
+			},
+//滚动条			
+			dataZoom: [
+			    {
+			        type: 'slider',
+			        show: true,
+			        yAxisIndex: [0],
+			        left: '93%',
+			        start: 5, //数据窗口范围的起始百分比
+			        end: 55
+			    },
+			    {
+			        type: 'inside',
+			        yAxisIndex: [0],
+			        start: 5,
+			        end: 55
+			    }
+			],
+			
+            series: [
+                {
+                	name:"博客",
+                	type:'bar',
+                	data:visit1
+                },
+                {
+                	name:"查找",
+                	type:"bar",
+                	data:visit2
+                },
+                {
+                	name:"案例",
+                	type:"bar",
+                	data:visit3
+                },
+                {
+                	name:"注册",
+                	type:"bar",
+                	data:visit4
+                },
+                {
+                	name:"用户生成",
+                	type:"bar",
+                	data:visit5
+                },
+                {
+                	name:"社区",
+                	type:"bar",
+                	data:visit6
+                },
+                {
+                	name:"训练",
+                	type:"bar",
+                	data:visit7
+                }
+            ],
+       
+})
+     }
+})
+
+//退出
+$.ajax({
+		 type : "post",
+    // async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+     url : "Web",    //请求发送到TestServlet处
+     dataType : "json",        //返回数据形式为json
+     success : function(ddata) {
+    	 var page1=[],page2=[],page3=[],page4=[],page5=[],page6=[],page7=[],
+    	 exit1=[],exit2=[],exit3=[],exit4=[],exit5=[],exit6=[],exit7=[];
+
+ 		
+		for(var i=0;i<ddata.type3.length;i++){
+			if(ddata.type3[i]=="博客"){
+
+			exit1.push(ddata.exit[i]);
+			page1.push(ddata.page3[i]);
+			}
+			if(ddata.type3[i]=="查找"){
+
+				exit2.push(ddata.exit[i]);
+				page2.push(ddata.page3[i]);
+				}
+			if(ddata.type3[i]=="案例"){
+
+				exit3.push(ddata.exit[i]);
+				page3.push(ddata.page3[i]);
+				}
+			if(ddata.type3[i]=="注册"){
+
+				exit4.push(ddata.exit[i]);
+				page4.push(ddata.page3[i]);
+				}
+			if(ddata.type3[i]=="用户生成"){
+
+				exit5.push(ddata.exit[i]);
+				page5.push(ddata.page3[i]);
+				}
+			if(ddata.type3[i]=="社区"){
+
+				exit6.push(ddata.exit[i]);
+				page6.push(ddata.page3[i]);
+				}
+			if(ddata.type3[i]=="训练"){
+
+				exit7.push(ddata.exit[i]);
+				page7.push(ddata.page3[i]);
+				}
+		}
+
+
+        myTwo.setOption({
+            
+            title: {
+                subtext: '退出',
+                x:'left'
+            },
+            
+            legend:{
+            	data:['博客','查找','案例','注册','用户生成','社区','训练']
+            },
+            
+            
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+                
+            },
+            
+
+            
+            toolbox: {//工具栏
+                show: true,
+                orient : 'vertical',//工具栏 icon 的布局朝向
+                x: 'right',
+                y: 'center',
+                feature : {//各工具配置项。
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                    restore : {show: true},//配置项还原。
+                    saveAsImage : {show: true}//保存为图片。
+                }
+            },
+			xAxis:{
+				name:"退出",
+				type:'value'
+			},
+			
+			yAxis:{
+				name:"页面",
+				type:'category',
+	            axisTick : {show: false},
+				data:ddata.page3
+			},
+			grid:{
+				x:100
+			},
+//滚动条			
+			dataZoom: [
+			    {
+			        type: 'slider',
+			        show: true,
+			        yAxisIndex: [0],
+			        left: '93%',
+			        start: 5, //数据窗口范围的起始百分比
+			        end: 55
+			    },
+			    {
+			        type: 'inside',
+			        yAxisIndex: [0],
+			        start: 5,
+			        end: 55
+			    }
+			],
+			
+            series: [
+                {
+                	name:"博客",
+                	type:'bar',
+                	data:exit1
+                },
+                {
+                	name:"查找",
+                	type:"bar",
+                	data:exit2
+                },
+                {
+                	name:"案例",
+                	type:"bar",
+                	data:exit3
+                },
+                {
+                	name:"注册",
+                	type:"bar",
+                	data:exit4
+                },
+                {
+                	name:"用户生成",
+                	type:"bar",
+                	data:exit5
+                },
+                {
+                	name:"社区",
+                	type:"bar",
+                	data:exit6
+                },
+                {
+                	name:"训练",
+                	type:"bar",
+                	data:exit7
+                }
+            ],
+       
+})
+     }
+})
+
+
+//单次访问时长
+$.ajax({
+		 type : "post",
+    // async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+     url : "Web",    //请求发送到TestServlet处
+     dataType : "json",        //返回数据形式为json
+     success : function(edata) {
+    	 var page1=[],page2=[],page3=[],page4=[],page5=[],page6=[],page7=[],
+    	 time1=[],time2=[],time3=[],time4=[],time5=[],time6=[],time7=[];
+
+ 		
+		for(var i=0;i<edata.type3.length;i++){
+			if(edata.type3[i]=="博客"){
+
+			time1.push(edata.time3[i]);
+			page1.push(edata.page3[i]);
+			}
+			if(edata.type3[i]=="查找"){
+
+				time2.push(edata.time3[i]);
+				page2.push(edata.page3[i]);
+				}
+			if(edata.type3[i]=="案例"){
+
+				time3.push(edata.time3[i]);
+				page3.push(edata.page3[i]);
+				}
+			if(edata.type3[i]=="注册"){
+
+				time4.push(edata.time3[i]);
+				page4.push(edata.page3[i]);
+				}
+			if(edata.type3[i]=="用户生成"){
+
+				time5.push(edata.time3[i]);
+				page5.push(edata.page3[i]);
+				}
+			if(edata.type3[i]=="社区"){
+
+				time6.push(edata.time3[i]);
+				page6.push(edata.page3[i]);
+				}
+			if(edata.type3[i]=="训练"){
+
+				time7.push(edata.time3[i]);
+				page7.push(edata.page3[i]);
+				}
+		}
+
+
+        myThree.setOption({
+            
+            title: {
+                subtext: '单次访问时长',
+                x:'left'
+            },
+            
+            legend:{
+            	data:['博客','查找','案例','注册','用户生成','社区','训练']
+            },
+            
+            
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                }
+                
+            },
+            
+
+            
+            toolbox: {//工具栏
+                show: true,
+                orient : 'vertical',//工具栏 icon 的布局朝向
+                x: 'right',
+                y: 'center',
+                feature : {//各工具配置项。
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+                    restore : {show: true},//配置项还原。
+                    saveAsImage : {show: true}//保存为图片。
+                }
+            },
+			xAxis:{
+				name:"单次访问时长",
+				type:'value'
+			},
+			
+			yAxis:{
+				name:"页面",
+				type:'category',
+	            axisTick : {show: false},
+				data:edata.page3
+			},
+			grid:{
+				x:100
+			},
+//滚动条			
+			dataZoom: [
+			    {
+			        type: 'slider',
+			        show: true,
+			        yAxisIndex: [0],
+			        left: '93%',
+			        start: 5, //数据窗口范围的起始百分比
+			        end: 55
+			    },
+			    {
+			        type: 'inside',
+			        yAxisIndex: [0],
+			        start: 5,
+			        end: 55
+			    }
+			],
+			
+            series: [
+                {
+                	name:"博客",
+                	type:'bar',
+                	data:time1
+                },
+                {
+                	name:"查找",
+                	type:"bar",
+                	data:time2
+                },
+                {
+                	name:"案例",
+                	type:"bar",
+                	data:time3
+                },
+                {
+                	name:"注册",
+                	type:"bar",
+                	data:time4
+                },
+                {
+                	name:"用户生成",
+                	type:"bar",
+                	data:time5
+                },
+                {
+                	name:"社区",
+                	type:"bar",
+                	data:time6
+                },
+                {
+                	name:"训练",
+                	type:"bar",
+                	data:time7
+                }
+            ],
+       
+})
+     }
+})
+</script>
+</body>
+</html>
